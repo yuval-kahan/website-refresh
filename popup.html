@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Website Refresher</title>
+  <script src="popup.js"></script>
+  <style>
+    body {
+      width: 450px;
+      height: 450px;
+      margin: 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .website-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .delete-icon {
+      cursor: pointer;
+      margin-right: 5px;
+      width: 16px;
+      height: 16px;
+    }
+    .website-name {
+      flex-grow: 1;
+    }
+    .toggle {
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    .enabled {
+      background-color: green;
+      color: white;
+    }
+    .disabled {
+      background-color: red;
+      color: white;
+    }
+    .website-input-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .website-input-container label {
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+    .website-input-container input[type="text"] {
+      flex-grow: 1;
+      margin-right: 10px;
+      width: 200px;
+    }
+    .config-buttons {
+      margin-bottom: 10px;
+    }
+    .config-buttons button {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .timer-container {
+      margin-bottom: 10px;
+    }
+    .timer-container span {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Website Refresher</h1>
+  <div class="config-buttons">
+    <button id="exportConfig">Export Configuration</button>
+    <button id="importConfig">Import Configuration</button>
+    <input type="file" id="importInput" style="display: none;">
+    <button id="logsButton" style="display: none;">Logs</button>
+  </div>
+  <label for="interval">Refresh Interval (minutes):</label>
+  <select id="interval">
+    <option value="1">1</option>
+    <option value="10">10</option>
+    <option value="20">20</option>
+    <option value="30">30</option>
+    <option value="40">40</option>
+    <option value="50">50</option>
+    <option value="60">60</option>
+  </select>
+  <br><br>
+  <div class="website-input-container">
+    <label for="website">Enter Website:</label>
+    <input type="text" id="website" placeholder="Enter website URL">
+    <button id="addWebsite">Add</button>
+  </div>
+  <div class="timer-container">
+    <span>Timer:</span>
+    <button id="timerToggle" class="disabled">Disabled</button>
+    <span>Seconds:</span>
+    <button id="secondsToggle" class="disabled">Disabled</button>
+  </div>
+  <br>
+  <ul id="websiteList"></ul>
+</body>
+</html>
