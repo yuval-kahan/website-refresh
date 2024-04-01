@@ -9,18 +9,19 @@ Background Operations: Utilizing a background script (background.js), the extens
 This extension is particularly useful for those who need to keep track of frequently updated web content, such as news sites, stock prices, or social media feeds.
 
 **Steps to Load the Extension in Chrome**
-Open Chrome: Start by opening your Google Chrome browser.
+
+1.Open Chrome: Start by opening your Google Chrome browser.
 
 Access Extensions Page:
 
-Click on the three dots (⋮) in the upper-right corner of Chrome to open the menu.
+2.Click on the three dots (⋮) in the upper-right corner of Chrome to open the menu.
 Navigate to More Tools > Extensions. Alternatively, you can type chrome://extensions/ into the address bar and press Enter.
 Enable Developer Mode:
 
-On the Extensions page, you'll find a toggle switch in the upper-right corner labeled “Developer mode”.
+3.On the Extensions page, you'll find a toggle switch in the upper-right corner labeled “Developer mode”.
 Click this toggle to turn on Developer Mode. This enables you to load unpacked extensions.
 Load the Unpacked Extension:
 
-Click on the “Load unpacked” button which appears after you enable Developer Mode.
+4.Click on the “Load unpacked” button which appears after you enable Developer Mode.
 Navigate to the folder where your extension files are located. This folder should include the manifest.json file, along with any other files (like HTML, CSS, JS) that make up your extension.
 Select the entire folder (not just the individual files inside it) and click 'Open' or 'Select Folder', depending on your operating system.
