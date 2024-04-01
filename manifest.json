@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Website Refresher",
+  "version": "1.0",
+  "description": "Refreshes specified websites at user-defined intervals",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "<all_urls>",
+    "tabs",
+    "alarms"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "web_accessible_resources": [
+    "images/*"
+  ]
+}
