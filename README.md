@@ -15,7 +15,7 @@ This extension is particularly useful for those who need to keep track of freque
 Access Extensions Page:
 
 **2**.Click on the three dots (⋮) in the upper-right corner of Chrome to open the menu.
-Navigate to More Tools > Extensions. Alternatively, you can type chrome://extensions/ into the address bar and press Enter.
+Navigate to  Extensions. Alternatively, you can type **chrome://extensions/** into the address bar and press Enter.
 Enable Developer Mode:
 
 **3**.On the Extensions page, you'll find a toggle switch in the upper-right corner labeled “Developer mode”.
