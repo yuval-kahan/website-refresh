@@ -1,4 +1,4 @@
-The Chrome extension "Website Refresher" enables users to automatically refresh specific websites at user-defined intervals. Here's a brief summary of its features:
+The Chrome extension "Website Refresher" enables users to automatically refresh specific websites at user-defined intervals.
 
 Core Functionality: Refreshes websites based on a selected interval (e.g., every 1, 10, 20 minutes, etc.).
 User Interface: A popup UI allows users to add websites they want to refresh and specify the interval for each site. Users can view and manage their list of websites, enabling or disabling refresh for each as needed.
