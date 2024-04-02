@@ -49,6 +49,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   } else if (message.action === 'stopTimer') {
     var website = message.website;
     stopTimer(website);
+  } else if (message.action === 'isTimerRunning') {
+    var website = message.website;
+    var isRunning = timers[website] !== undefined;
+    sendResponse({ isRunning: isRunning });
   }
 });
 
@@ -82,6 +86,7 @@ function updateTimerDisplay(website, timeLeft) {
       return item.url === website;
     });
     if (index !== -1) {
+      websites[index].timeLeft = timeLeft;
       var timerText = secondsEnabled ? formatTime(timeLeft, true) : formatTime(timeLeft, false);
       websites[index].timerText = timerText;
       chrome.storage.sync.set({ websites: websites }, function() {
@@ -92,14 +97,18 @@ function updateTimerDisplay(website, timeLeft) {
 }
 
 chrome.runtime.onInstalled.addListener(function() {
-  chrome.storage.sync.get(['websites', 'timerEnabled'], function(data) {
+  chrome.storage.sync.get(['websites', 'timerEnabled', 'secondsEnabled'], function(data) {
     var websites = data.websites || [];
-    var timerEnabled = data.timerEnabled || false;
-    websites.forEach(function(website) {
-      if (website.enabled && timerEnabled) {
-        var interval = parseInt(website.interval, 10);
-        startTimer(website.url, interval);
-      }
+    var timerEnabled = data.timerEnabled !== undefined ? data.timerEnabled : true;
+    var secondsEnabled = data.secondsEnabled !== undefined ? data.secondsEnabled : true;
+    
+    chrome.storage.sync.set({ timerEnabled: timerEnabled, secondsEnabled: secondsEnabled }, function() {
+      websites.forEach(function(website) {
+        if (website.enabled && timerEnabled) {
+          var interval = parseInt(website.interval, 10);
+          startTimer(website.url, interval);
+        }
+      });
     });
   });
 });
