@@ -40,15 +40,62 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Add website to list
-  addButton.addEventListener('click', function() {
-    var website = websiteInput.value.trim();
-    if (website !== '') {
-      var interval = intervalSelect.value;
-      addWebsiteToList(website, interval, true);
-      saveWebsitesToStorage();
-      logEvent('Website added: ' + website);
-    }
+ // Add website to list
+addButton.addEventListener('click', function() {
+  var website = websiteInput.value.trim();
+  if (website !== '') {
+    var interval = intervalSelect.value;
+    addWebsiteToList(website, interval, true);
+    saveWebsitesToStorage();
+    logEvent('Website added: ' + website);
+    chrome.runtime.sendMessage({ action: 'startTimer', website: website, interval: interval });
+  }
+});
+
+// Add website to list
+function addWebsiteToList(website, interval, enabled) {
+  var li = document.createElement('li');
+  li.classList.add('website-item');
+
+  var deleteIcon = document.createElement('img');
+  deleteIcon.classList.add('delete-icon');
+  deleteIcon.src = 'images/trash-icon.svg';
+  deleteIcon.alt = 'Delete';
+  li.appendChild(deleteIcon);
+
+  var websiteName = document.createElement('span');
+  websiteName.classList.add('website-name');
+  websiteName.textContent = extractDomainName(website);
+  websiteName.dataset.fullUrl = website;
+  li.appendChild(websiteName);
+
+  var intervalSpan = document.createElement('span');
+  intervalSpan.classList.add('interval');
+  intervalSpan.textContent = ' (' + interval + ' min)';
+  li.appendChild(intervalSpan);
+
+  var timerSpan = document.createElement('span');
+  timerSpan.classList.add('timer');
+  chrome.storage.sync.get(['secondsEnabled', 'websites'], function(data) {
+    var secondsEnabled = data.secondsEnabled || false;
+    var websites = data.websites || [];
+    var websiteData = websites.find(function(item) {
+      return item.url === website;
+    });
+    var timeLeft = websiteData ? websiteData.timeLeft : interval * 60;
+    var timerText = secondsEnabled ? formatTime(timeLeft, true) : formatTime(timeLeft, false);
+    timerSpan.textContent = 'Next refresh: ' + timerText;
   });
+  li.appendChild(timerSpan);
+
+  var toggle = document.createElement('span');
+  toggle.classList.add('toggle');
+  toggle.classList.add(enabled ? 'enabled' : 'disabled');
+  toggle.textContent = enabled ? 'Enable' : 'Disable';
+  li.appendChild(toggle);
+
+  websiteList.appendChild(li);
+}
 
   // Export configuration
   exportButton.addEventListener('click', function() {
@@ -132,6 +179,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+// Extract domain name from URL
+function extractDomainName(url) {
+  var domain = url.replace(/^https?:\/\//, '');
+  domain = domain.split('/')[0];
+  return domain;
+}
+
+// Format time in MM:SS format or MM format
+function formatTime(seconds, includeSeconds) {
+  var minutes = Math.floor(seconds / 60);
+  var remainingSeconds = seconds % 60;
+  if (includeSeconds) {
+    return pad(minutes) + ':' + pad(remainingSeconds);
+  } else {
+    return minutes + ' min';
+  }
+}
+
+// Pad single digit numbers with leading zero
+function pad(num) {
+  return num < 10 ? '0' + num : num;
+}
+
   // Toggle timer
   timerToggle.addEventListener('click', function() {
     var isEnabled = timerToggle.classList.contains('disabled');
@@ -148,15 +218,23 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Load timer state from storage
-  chrome.storage.sync.get('timerEnabled', function(data) {
-    var isEnabled = data.timerEnabled || false;
-    timerToggle.classList.toggle('enabled', isEnabled);
-    timerToggle.classList.toggle('disabled', !isEnabled);
-    timerToggle.textContent = isEnabled ? 'Enabled' : 'Disabled';
-    if (isEnabled) {
-      startAllTimers();
-    }
-  });
+chrome.storage.sync.get('timerEnabled', function(data) {
+  var isEnabled = data.timerEnabled !== undefined ? data.timerEnabled : true;
+  timerToggle.classList.toggle('enabled', isEnabled);
+  timerToggle.classList.toggle('disabled', !isEnabled);
+  timerToggle.textContent = isEnabled ? 'Enabled' : 'Disabled';
+  if (isEnabled) {
+    startAllTimers();
+  }
+});
+
+// Load seconds display state from storage
+chrome.storage.sync.get('secondsEnabled', function(data) {
+  var isEnabled = data.secondsEnabled !== undefined ? data.secondsEnabled : true;
+  secondsToggle.classList.toggle('enabled', isEnabled);
+  secondsToggle.classList.toggle('disabled', !isEnabled);
+  secondsToggle.textContent = isEnabled ? 'Enabled' : 'Disabled';
+});
 
   // Toggle seconds display
   secondsToggle.addEventListener('click', function() {
@@ -257,88 +335,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Add website to list
   function addWebsiteToList(website, interval, enabled) {
-    var li = document.createElement('li');
-    li.classList.add('website-item');
+  var li = document.createElement('li');
+  li.classList.add('website-item');
 
-    var deleteIcon = document.createElement('img');
-    deleteIcon.classList.add('delete-icon');
-    deleteIcon.src = 'images/trash-icon.svg';
-    deleteIcon.alt = 'Delete';
-    li.appendChild(deleteIcon);
+  var deleteIcon = document.createElement('img');
+  deleteIcon.classList.add('delete-icon');
+  deleteIcon.src = 'images/trash-icon.svg';
+  deleteIcon.alt = 'Delete';
+  li.appendChild(deleteIcon);
 
-    var websiteName = document.createElement('span');
-    websiteName.classList.add('website-name');
-    websiteName.textContent = extractDomainName(website);
-    websiteName.dataset.fullUrl = website;
-    li.appendChild(websiteName);
+  var websiteName = document.createElement('span');
+  websiteName.classList.add('website-name');
+  websiteName.textContent = extractDomainName(website);
+  websiteName.dataset.fullUrl = website;
+  li.appendChild(websiteName);
 
-    var intervalSpan = document.createElement('span');
-    intervalSpan.classList.add('interval');
-    intervalSpan.textContent = ' (' + interval + ' min)';
-    li.appendChild(intervalSpan);
+  var intervalSpan = document.createElement('span');
+  intervalSpan.classList.add('interval');
+  intervalSpan.textContent = ' (' + interval + ' min)';
+  li.appendChild(intervalSpan);
 
-    var timerSpan = document.createElement('span');
-    timerSpan.classList.add('timer');
-    chrome.storage.sync.get(['secondsEnabled', 'websites'], function(data) {
-      var secondsEnabled = data.secondsEnabled || false;
-      var websites = data.websites || [];
-      var websiteData = websites.find(function(item) {
-        return item.url === website;
-      });
-      var timeLeft = websiteData ? websiteData.timeLeft : interval * 60;
-      var timerText = secondsEnabled ? formatTime(timeLeft, true) : formatTime(timeLeft, false);
-      timerSpan.textContent = 'Next refresh: ' + timerText;
+  var timerSpan = document.createElement('span');
+  timerSpan.classList.add('timer');
+  chrome.storage.sync.get(['secondsEnabled', 'websites'], function(data) {
+    var secondsEnabled = data.secondsEnabled || false;
+    var websites = data.websites || [];
+    var websiteData = websites.find(function(item) {
+      return item.url === website;
     });
-    li.appendChild(timerSpan);
+    var timeLeft = websiteData ? websiteData.timeLeft : interval * 60;
+    var timerText = secondsEnabled ? formatTime(timeLeft, true) : formatTime(timeLeft, false);
+    timerSpan.textContent = 'Next refresh: ' + timerText;
+  });
+  li.appendChild(timerSpan);
 
-    var toggle = document.createElement('span');
-    toggle.classList.add('toggle');
-    toggle.classList.add(enabled ? 'enabled' : 'disabled');
-    toggle.textContent = enabled ? 'Enable' : 'Disable';
-    li.appendChild(toggle);
+  var toggle = document.createElement('span');
+  toggle.classList.add('toggle');
+  toggle.classList.add(enabled ? 'enabled' : 'disabled');
+  toggle.textContent = enabled ? 'Enable' : 'Disable';
+  li.appendChild(toggle);
 
-    websiteList.appendChild(li);
+  websiteList.appendChild(li);
 
-    if (enabled) {
-      startTimer(website, interval);
-    }
-  }
-
-  // Extract domain name from URL
-  function extractDomainName(url) {
-    var domain = url.replace(/^https?:\/\//, '');
-    domain = domain.split('/')[0];
-    return domain;
-  }
-
-  // Format time in MM:SS format or MM format
-  function formatTime(seconds, includeSeconds) {
-    var minutes = Math.floor(seconds / 60);
-    var remainingSeconds = seconds % 60;
-    if (includeSeconds) {
-      return pad(minutes) + ':' + pad(remainingSeconds);
-    } else {
-      return minutes + ' min';
-    }
-  }
-
-  // Pad single digit numbers with leading zero
-  function pad(num) {
-    return num < 10 ? '0' + num : num;
-  }
-
-  // Start all timers
-  function startAllTimers() {
-    chrome.storage.sync.get('websites', function(data) {
-      var websites = data.websites || [];
-      websites.forEach(function(website) {
-        if (website.enabled) {
-          var interval = parseInt(website.interval, 10);
-          startTimer(website.url, interval);
-        }
-      });
+  // Check if a timer is already running for the website
+  if (enabled) {
+    chrome.runtime.sendMessage({ action: 'isTimerRunning', website: website }, function(response) {
+      if (!response.isRunning) {
+        startTimer(website, interval);
+      }
     });
   }
+}
 
   // Stop all timers
   function stopAllTimers() {
