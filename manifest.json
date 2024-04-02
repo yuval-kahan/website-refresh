@@ -10,6 +10,12 @@
     "tabs",
     "alarms"
   ],
+  "icons": {
+    "16": "images/main_16.png",
+    "32": "images/main_32.png",
+    "48": "images/main_48.png",
+    "128": "images/main_128.png"
+  },
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "images/main.png"
