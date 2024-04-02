@@ -28,7 +28,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 });
 
 function refreshWebsite(website) {
-  chrome.tabs.query({ url: website }, function(tabs) {
+  chrome.tabs.query({ url: `*://${extractDomainName(website)}/*` }, function(tabs) {
     if (tabs.length > 0) {
       chrome.tabs.reload(tabs[0].id, {}, function() {
         logEvent('Website refreshed: ' + website, 'lightgreen');
@@ -121,8 +121,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
   }
 });
 
-// ... existing code ...
-
 function logEvent(event, backgroundColor) {
   var timestamp = new Date().toISOString();
   var logEntry = {
@@ -139,9 +137,12 @@ function logEvent(event, backgroundColor) {
   });
 }
 
-// ... existing code ...
+function extractDomainName(url) {
+  var domain = url.replace(/^https?:\/\//, '');
+  domain = domain.split('/')[0];
+  return domain;
+}
 
-// Format time in MM:SS format or MM format
 function formatTime(seconds, includeSeconds) {
   var minutes = Math.floor(seconds / 60);
   var remainingSeconds = seconds % 60;
@@ -152,7 +153,6 @@ function formatTime(seconds, includeSeconds) {
   }
 }
 
-// Pad single digit numbers with leading zero
 function pad(num) {
   return num < 10 ? '0' + num : num;
 }
