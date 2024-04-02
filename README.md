@@ -25,3 +25,6 @@ Load the Unpacked Extension:
 **4**.Click on the “Load unpacked” button which appears after you enable Developer Mode.
 Navigate to the folder where your extension files are located. This folder should include the manifest.json file, along with any other files (like HTML, CSS, JS) that make up your extension.
 Select the entire folder (not just the individual files inside it) and click 'Open' or 'Select Folder', depending on your operating system.
+
+![image](https://github.com/yuval-kahan/website-refresh/assets/109478340/6e26df2d-9097-4487-ab68-d03936f3b7f8)
+
